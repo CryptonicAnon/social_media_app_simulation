@@ -10,7 +10,11 @@ valid_password = "pass"
 
 @app.route("/")
 def home():
-    return render_template('home.html')
+    return render_template('landing_login_page.html')
+
+@app.route("/feed")
+def feed():
+    return render_template('feed.html')
 
 @app.route("/inbox")
 def inbox():
@@ -24,7 +28,7 @@ def newsfeed():
 def submit_message():
     message = request.form.get('send_message')  # Get the submitted message
     messages.append(message)  # Store the message in the inbox
-    return redirect(url_for('inbox'))
+    return redirect(url_for('feed'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -34,12 +38,17 @@ def login():
         
         # Check if credentials match
         if username == valid_username and password == valid_password:
-            return redirect(url_for('home'))
+            return redirect(url_for('feed'))
         else:
             flash("Invalid username or password", "error")
             return redirect(url_for('login'))
     
     return render_template('login.html')  # Display login form if GET request
-        
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)  # Remove the session variable
+    return redirect(url_for('landing_login_page'))
+
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=True)
