@@ -11,7 +11,11 @@ div {text-align: center;}
 <h1>Welcome to your Social Media Inbox.</h1>
 <p>Messages from members will appear here.</p>
 <div>This is a div.</div>
-
+<ul>
+    {% for message in messages %}
+        <li>{{ message }}</li>
+    {% endfor %}
+</ul>
 <a href="http://127.0.0.1:5000/">
     <button>Go to the main page</button>
 </a>

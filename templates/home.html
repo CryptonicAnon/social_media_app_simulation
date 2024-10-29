@@ -4,17 +4,29 @@
 <style>
 h1 {text-align: center;}
 p {text-align: center;}
+/* Center-align form containers */
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 20px;
+}
 </style>
 </head>
 <body>
 
 <h1>FAKE SOCIAL MEDIA MAIN PAGE.</h1>
 <p>MAIN PAGE SHENANIGANS.</p>
-
-<form action="/action_page.php">
+<div class="center-container">
+<form action="http://127.0.0.1:5000/login">
+    <input type="submit" value="Click To login">
+  </form> 
+</div>
+<form action="http://127.0.0.1:5000/submit_message" method="post">
     <label for="send_message">Send Message:</label><br>
-    <input type="text" id="send_message" name="send_message" value=" "><br><br>
-    <input type="submit" value="Submit">
+    <input type="text" id="send_message" name="send_message" required><br><br>
+    <input type="submit" value="Send to Inbox">
 </form> 
 
 <a href="http://127.0.0.1:5000/notifications">
