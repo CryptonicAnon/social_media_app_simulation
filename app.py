@@ -1,10 +1,15 @@
-#from command line run 'python3 -m flask run --debug' then access http://127.0.0.1:5000
-#from WSL 'flask run host=0.0.0.0'
-#will have to create individual format files to design layout for endpoint (or could realistically make em all look the same)
-from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from models import User, initialize  # Import models and initialize function
+#to test on wsl: flask run --host=0.0.0.0
+from flask import (Flask, g, render_template, render_template, request, redirect, url_for, flash, session,
+                  abort)
+from flask_bcrypt import (Bcrypt, check_password_hash)
+from flask_login import (LoginManager, login_user, logout_user,
+                             login_required, current_user)
+
+import forms
+import models
+from models import User, initialize
+
+messages = []
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -37,7 +42,7 @@ def feed():
 @app.route("/inbox")
 @login_required
 def inbox():
-    return render_template('inbox.html', messages=[])
+    return render_template('inbox.html', messages=messages)
 
 @app.route("/notifications")
 @login_required
@@ -51,23 +56,36 @@ def submit_message():
     messages.append(message)
     return redirect(url_for('feed'))
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/register', methods=('GET', 'POST'))
+def register():
+    form = forms.RegisterForm()
+    if form.validate_on_submit():
+        flash("Registration successful!", "success")
+        models.User.create_user(
+            username=form.username.data,
+            email=form.email.data,
+            password=form.password.data,
+            password2=form.password2.data
+        )
+        return redirect(url_for('index'))
+    return render_template('register.html', form=form)
+
+@app.route('/login', methods=('GET', 'POST'))
 def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        
+    form = forms.LoginForm()
+    if form.validate_on_submit():
         try:
-            user = User.get(User.username == username)
-            if bcrypt.check_password_hash(user.password, password):
+            user = models.User.get(models.User.email == form.email.data)
+        except models.DoesNotExist:
+            flash("Your email or password doesn't match!", "error")
+        else:
+            if check_password_hash(user.password, form.password.data):
                 login_user(user)
-                return redirect(url_for('feed'))
+                flash("You've been logged in!", "success")
+                return redirect(url_for('index'))
             else:
-                flash("Invalid password", "error")
-        except User.DoesNotExist:
-            flash("Invalid username", "error")
-    
-    return render_template('login.html')
+                flash("Your email or password doesn't match!", "error")
+    return render_template('login.html', form=form)
 
 @app.route('/logout')
 @login_required
@@ -76,5 +94,14 @@ def logout():
     return redirect(url_for('home'))
 
 if __name__ == '__main__':
-    initialize()  # Initialize the database
-    app.run(debug=True)
+    models.initialize()
+    try:
+        models.User.create_user(
+            username='testuser',
+            email='test@test.com',
+            password='password',
+            admin=True
+        )
+    except ValueError:
+        pass
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=True)
