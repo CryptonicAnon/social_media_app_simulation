@@ -4,6 +4,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+import models
 from models import User, initialize  # Import models and initialize function
 
 app = Flask(__name__)
@@ -31,7 +32,7 @@ def home():
     return render_template('landing_login_page.html')
 
 @app.route("/create_account")
-def create_account():
+def register():
     return render_template('register.html')
 
 @app.route("/feed")
@@ -91,7 +92,6 @@ def create_account():
             flash("Invalid username", "error")
     
     return render_template('login.html')
-
 
 @app.route('/logout')
 @login_required
