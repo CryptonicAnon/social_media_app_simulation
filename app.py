@@ -11,6 +11,7 @@ app.secret_key = 'your_secret_key'
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+messages = []
 
 # User loader function for Flask-Login
 @login_manager.user_loader
@@ -27,7 +28,8 @@ def before_request():
 
 @app.route("/")
 def home():
-    return render_template('landing_login_page.html')
+    #return render_template('landing_login_page.html')
+    return render_template('register.html')
 
 @app.route("/feed")
 @login_required
@@ -37,7 +39,7 @@ def feed():
 @app.route("/inbox")
 @login_required
 def inbox():
-    return render_template('inbox.html', messages=[])
+    return render_template('inbox.html', messages=messages)
 
 @app.route("/notifications")
 @login_required
@@ -68,6 +70,25 @@ def login():
             flash("Invalid username", "error")
     
     return render_template('login.html')
+
+@app.route('/create_account', methods=['GET', 'POST'])
+def create_account():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        try:
+            user = username
+            if bcrypt.check_password_hash(user.password, password):
+                login_user(user)
+                return redirect(url_for('feed'))
+            else:
+                flash("Invalid password", "error")
+        except User.DoesNotExist:
+            flash("Invalid username", "error")
+    
+    return render_template('login.html')
+
 
 @app.route('/logout')
 @login_required
