@@ -28,7 +28,10 @@ def before_request():
 
 @app.route("/")
 def home():
-    #return render_template('landing_login_page.html')
+    return render_template('landing_login_page.html')
+
+@app.route("/create_account")
+def create_account():
     return render_template('register.html')
 
 @app.route("/feed")
@@ -98,4 +101,13 @@ def logout():
 
 if __name__ == '__main__':
     initialize()  # Initialize the database
+    try:
+        models.User.create_user(
+            username='testuser',
+            email='test@test.com',
+            password='password',
+            admin=True
+        )
+    except ValueError:
+        pass
     app.run(debug=True)
