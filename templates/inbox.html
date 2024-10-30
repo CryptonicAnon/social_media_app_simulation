@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+h1 {text-align: center;}
+p {text-align: center;}
+div {text-align: center; margin-bottom: 10px;}
+ul { 
+    list-style-position: inside;  /* Center-align bullets with the text */
+    padding: 0;  /* Remove default padding */
+}
+.buttons {text-align: left;}
+</style>
+</head>
+<body>
+<h1>Welcome to your Social Media Inbox.</h1>
+<p>Messages from members will appear here.</p>
+<div>
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="buttons">
+    <a href="http://127.0.0.1:5000/feed">
+        <button>Check your Feed</button>
+</a>
+</div>
+<div class="buttons">
+    <a href="http://127.0.0.1:5000/notifications">
+        <button>Go to your notifications</button>
+</div>
+</a>
+</body>
+</html>
