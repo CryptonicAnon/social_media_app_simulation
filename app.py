@@ -1,4 +1,5 @@
 #from command line run 'python3 -m flask run --debug' then access http://127.0.0.1:5000
+#from WSL 'flask run host=0.0.0.0'
 #will have to create individual format files to design layout for endpoint (or could realistically make em all look the same)
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 
