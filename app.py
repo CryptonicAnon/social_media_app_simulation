@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import models
-from models import User, initialize  # Import models and initialize function
+from models import User, Post, initialize  # Import models and initialize function
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -58,7 +58,7 @@ def submit_message():
     messages.append(message)
     return redirect(url_for('feed'))
 
-#route for login page with login form built in
+#login form method
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -77,11 +77,12 @@ def login():
     
     return render_template('login.html')
 
-#route for create account page with account creation form built in
+#account creation method
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
     if request.method == 'POST':
         username = request.form.get('username')
+        email = request.form.get('email')
         password = request.form.get('password')
         
         try:
@@ -95,6 +96,24 @@ def create_account():
             flash("Invalid username", "error")
     
     return render_template('login.html')
+
+from flask import request, redirect, url_for
+
+@app.route('/create_post', methods=['GET', 'POST'])
+@login_required
+def create_post():
+    if request.method == 'POST':
+        user = ""  #implement authentication to get current user
+        content = request.form['content']
+
+        post = Post.create(user=user, content=content)
+    return render_template('notifications.html')
+
+@app.route('/feed')
+@login_required
+def homepage():
+    posts = Post.select().order_by(Post.timestamp.desc())
+    return render_template('home.html', posts=posts)
 
 @app.route('/logout')
 @login_required

@@ -15,35 +15,7 @@ class User(UserMixin, Model):
 
     class Meta:
         database = DATABASE
-    # #getting posts
-    # def get_posts(self):
-    #     return Post.select().where(Post.user == self)
-    # #getting posts for feed
-    # def get_stream(self):
-    #     return Post.select().where(
-    #         (Post.user << self.following()) |
-    #         (Post.user == self)
-    #     )
-    # #gets users you follow
-    # def following(self):
-    #     return (
-    #         User.select().join(
-    #             Relationship, on=Relationship.to_user
-    #         ).where(
-    #             Relationship.from_user == self
-    #         )
-    #     )
-    # #gets users following you
-    # def followers(self):
-    #     return (
-    #         User.select().join(
-    #             Relationship, on=Relationship.from_user
-    #         ).where(
-    #             Relationship.to_user == self
-    #         )
-    #     )
 
-    
     @classmethod
     def create_user(cls, username, email, password, admin=False):
         try:
@@ -55,30 +27,25 @@ class User(UserMixin, Model):
             )
         except IntegrityError:
             raise ValueError("User already exists")
+        
+class Relationship(Model):
+    from_user = ForeignKeyField(User, backref='relationships')
+    to_user = ForeignKeyField(User, backref='related_to')
 
-# class Post(Model):
-#     timestamp = DateTimeField(default=datetime.datetime.now)
-#     user = ForeignKeyField(
-#         rel_model=User,
-#         related_name='posts'
-#     )
-#     content = TextField()
+    class Meta:
+        indexes = (
+            (('from_user', 'to_user'), True),
+        )
 
-#     class Meta:
-#         database = DATABASE
+class Post(Model):
+    timestamp = DateTimeField(default=datetime.datetime.now)
+    content = TextField()
+    user = ForeignKeyField(User)
 
-
-# class Relationship(Model):
-#     from_user = ForeignKeyField(User, related_name='relationships')
-#     to_user = ForeignKeyField(User, related_name='related_to')
-
-#     class Meta:
-#         database = DATABASE
-#         indexes = (
-#             (('from_user', 'to_user'), True)
-#         )
-
-
+    class Meta:
+        database = DATABASE
+        
+        
 
 def initialize():
     DATABASE.connect()
