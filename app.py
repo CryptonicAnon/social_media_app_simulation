@@ -1,21 +1,18 @@
-#to test on wsl: flask run --host=0.0.0.0
-from flask import (Flask, g, render_template, render_template, request, redirect, url_for, flash, session,
-                  abort)
-from flask_bcrypt import (Bcrypt, check_password_hash)
-from flask_login import (LoginManager, login_user, logout_user,
-                             login_required, current_user)
-
-import forms
+#from command line run 'python3 -m flask run --debug' then access http://127.0.0.1:5000
+#from WSL 'flask run host=0.0.0.0'
+#will have to create individual format files to design layout for endpoint (or could realistically make em all look the same)
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_bcrypt import Bcrypt
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import models
-from models import User, initialize
-
-messages = []
+from models import User, initialize  # Import models and initialize function
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+messages = []
 
 # User loader function for Flask-Login
 @login_manager.user_loader
@@ -25,14 +22,19 @@ def load_user(user_id):
     except User.DoesNotExist:
         return None
 
+#connect to database before each request
 @app.before_request
 def before_request():
-    """Connect to the database before each request."""
     initialize()
 
+#routes for each page
 @app.route("/")
 def home():
     return render_template('landing_login_page.html')
+
+@app.route("/create_account")
+def register():
+    return render_template('register.html')
 
 @app.route("/feed")
 @login_required
@@ -56,36 +58,43 @@ def submit_message():
     messages.append(message)
     return redirect(url_for('feed'))
 
-@app.route('/register', methods=('GET', 'POST'))
-def register():
-    form = forms.RegisterForm()
-    if form.validate_on_submit():
-        flash("Registration successful!", "success")
-        models.User.create_user(
-            username=form.username.data,
-            email=form.email.data,
-            password=form.password.data,
-            password2=form.password2.data
-        )
-        return redirect(url_for('index'))
-    return render_template('register.html', form=form)
-
-@app.route('/login', methods=('GET', 'POST'))
+#route for login page with login form built in
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    form = forms.LoginForm()
-    if form.validate_on_submit():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
         try:
-            user = models.User.get(models.User.email == form.email.data)
-        except models.DoesNotExist:
-            flash("Your email or password doesn't match!", "error")
-        else:
-            if check_password_hash(user.password, form.password.data):
+            user = User.get(User.username == username)
+            if bcrypt.check_password_hash(user.password, password):
                 login_user(user)
-                flash("You've been logged in!", "success")
-                return redirect(url_for('index'))
+                return redirect(url_for('feed'))
             else:
-                flash("Your email or password doesn't match!", "error")
-    return render_template('login.html', form=form)
+                flash("Invalid password", "error")
+        except User.DoesNotExist:
+            flash("Invalid username", "error")
+    
+    return render_template('login.html')
+
+#route for create account page with account creation form built in
+@app.route('/create_account', methods=['GET', 'POST'])
+def create_account():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        try:
+            user = username
+            if bcrypt.check_password_hash(user.password, password):
+                login_user(user)
+                return redirect(url_for('feed'))
+            else:
+                flash("Invalid password", "error")
+        except User.DoesNotExist:
+            flash("Invalid username", "error")
+    
+    return render_template('login.html')
 
 @app.route('/logout')
 @login_required
@@ -94,7 +103,7 @@ def logout():
     return redirect(url_for('home'))
 
 if __name__ == '__main__':
-    models.initialize()
+    initialize()  # Initialize the database
     try:
         models.User.create_user(
             username='testuser',
