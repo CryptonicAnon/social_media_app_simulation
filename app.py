@@ -65,6 +65,10 @@ def create_post():
     post = Post.create(user=user, content=content)
     return redirect(url_for('feed'))
 
+@app.route('/feed')
+def index():
+    stream = models.Post.select().limit(100)
+    return render_template('stream.html', stream=stream)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
