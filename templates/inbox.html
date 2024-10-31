@@ -17,8 +17,8 @@ ul {
 <p>Messages from members will appear here.</p>
 <div>
     <ul>
-        {% for message in messages %}
-            <li>{{ message }}</li>
+        {% for dm in dms %}
+            <li>{{ dm }}</li>
         {% endfor %}
     </ul>
 </div>
@@ -28,7 +28,11 @@ ul {
 </div>
 <div class="buttons">
     <a href="http://127.0.0.1:5000/notifications">
-        <button>Go to your notifications</button>
+        <button>Go to your Notifications</button>
+</div>
+<div class="buttons">
+    <a href="http://127.0.0.1:5000/dms">
+        <button>Send Another DM</button>
 </div>
 <div class = "buttons">
     <a href="http://127.0.0.1:5000/logout">

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+h1 {text-align: center;}
+p {text-align: center;}
+.send_dm {text-align: center;}
+div { margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<h1>Send a Direct Message!</h1>
+
+<div>
+    <a href="http://127.0.0.1:5000/feed">
+        <button>Check your Feed</button>
+    </a>
+</div>
+<div>
+    <a href="http://127.0.0.1:5000/notifications">
+        <button>Go to your Notifications</button>
+    </a>
+</div>
+<div>
+<a href="http://127.0.0.1:5000/inbox">
+    <button>Go to your Inbox</button>
+</a>
+</div>   
+<div>
+    <a href="http://127.0.0.1:5000/logout">
+        <button>Logout</button>
+    </a>
+</div>
+<div  class="send_dm">
+    <form action="http://127.0.0.1:5000/send_dm" method="post">
+        <label for="send_dm">Send A Message to the Inbox!:</label><br>
+        <input type="text" id="send_dm" name="send_dm" required><br><br>
+        <input type="submit" value="send_dm">
+</div>
+</form> 
+</body>
+</html>

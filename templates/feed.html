@@ -5,6 +5,7 @@
 h1 {text-align: center;}
 p {text-align: center;}
 .messages {text-align: center;}
+.create_post {text-align: center;}
 div { margin-bottom: 10px; }
 </style>
 </head>
@@ -15,24 +16,36 @@ div { margin-bottom: 10px; }
 
 <div>
     <a href="http://127.0.0.1:5000/notifications">
-        <button>Go to your notifications</button>
+        <button>Go to your Notifications</button>
     </a>
 </div>  
 <div>
     <a href="http://127.0.0.1:5000/inbox">
-        <button>Check your inbox</button>
+        <button>Check your Inbox</button>
     </a>
+</div>
+<div class="buttons">
+    <a href="http://127.0.0.1:5000/dms">
+        <button>Send Another DM</button>
 </div>
 <div>
     <a href="http://127.0.0.1:5000/logout">
         <button>Logout</button>
     </a>
 </div>
-<div  class="messages">
-    <form action="http://127.0.0.1:5000/submit_message" method="post">
-        <label for="send_message">Send Message:</label><br>
-        <input type="text" id="send_message" name="send_message" required><br><br>
-        <input type="submit" value="Send to Inbox">
+<div class="messages">
+    {% for post in posts %}
+        <div>
+            <li>{{ post.content }} </li> <!-- Adjust according to your Post model attributes -->
+            <!-- <p><small>Posted by: {{ post.user_id}}</small></p> Assuming you have a relationship with User model -->
+        </div>
+    {% endfor %}
+</div>
+<div  class="create_post">
+    <form action="http://127.0.0.1:5000/submit_post" method="post">
+        <label for="send_post">Create post:</label><br>
+        <input type="text" id="send_post" name="send_post" required><br><br>
+        <input type="submit" value="Post to feed">
 </div>
 </form> 
 </body>
