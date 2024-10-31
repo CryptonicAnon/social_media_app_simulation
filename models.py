@@ -37,16 +37,17 @@ class User(UserMixin, Model):
 #             (('from_user', 'to_user'), True),
 #         )
 
-# class Post(Model):
-#     timestamp = DateTimeField(default=datetime.datetime.now)
-#     content = TextField()
-#     user = ForeignKeyField(User)
+class Post(Model):
+    timestamp = DateTimeField(default=datetime.datetime.now)
+    content = TextField()
+    user = ForeignKeyField(User)
 
-#     class Meta:
-#         database = DATABASE
+    class Meta:
+        database = DATABASE
+        
 
 def initialize():
     DATABASE.connect()
     #DATABASE.create_tables([User, Post, Relationship], safe=True)
-    DATABASE.create_tables([User], safe=True)
+    DATABASE.create_tables([User, Post], safe=True)
     DATABASE.close()

@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import models
-from models import User, initialize  # Import models and initialize function
+from models import User, initialize, Post  # Import models and initialize function
 
 #from models import User, Post, Relationship, initialize  # Import models and initialize function
 
@@ -11,7 +11,7 @@ app.secret_key = 'your_secret_key'
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-messages = []
+dms = []
 
 # User loader function for Flask-Login
 @login_manager.user_loader
@@ -37,34 +37,39 @@ def register():
 @app.route("/feed")
 @login_required
 def feed():
-    return render_template('feed.html')
+    posts = Post.select()  # Fetch all posts from the database
+    return render_template('feed.html', posts=posts)
 
 @app.route("/inbox")
 @login_required
 def inbox():
-    return render_template('inbox.html', messages=messages)
+    return render_template('inbox.html', dms=dms)
 
 @app.route("/notifications")
 @login_required
 def notifications():
     return render_template('notifications.html')
 
-@app.route('/submit_message', methods=['POST'])
+@app.route("/dms")
 @login_required
-def submit_message():
-    message = request.form.get('send_message')
-    messages.append(message)
+def send_dms():
+    return render_template('dm.html', dms=dms)
+
+@app.route('/send_dm', methods=['POST'])
+@login_required
+def send_dm():
+    dm = request.form.get('send_dm')
+    dms.append(dm)
+    return redirect(url_for('send_dms'))
+
+@app.route('/submit_post', methods=['POST'])
+@login_required
+def create_post():
+    user = current_user
+    content = request.form.get('send_post')
+
+    post = Post.create(user=user, content=content)
     return redirect(url_for('feed'))
-
-# @app.route('/create_post', methods=['POST'])
-# @login_required
-# def create_post():
-#     user = user  #implement authentication to get current user
-#     content = request.form['content']
-
-#     post = Post.create(user=user, content=content)
-#     return render_template('feed.html')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -88,9 +93,6 @@ def create_account():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
-
-        # Hash the password
-        #hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
         try:
             models.User.create_user(username, email, password, admin=False)
