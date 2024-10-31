@@ -1,11 +1,10 @@
-#from command line run 'python3 -m flask run --debug' then access http://127.0.0.1:5000
-#from WSL 'flask run host=0.0.0.0'
-#will have to create individual format files to design layout for endpoint (or could realistically make em all look the same)
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import models
 from models import User, Post, initialize  # Import models and initialize function
+
+#from models import User, Post, Relationship, initialize  # Import models and initialize function
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -22,12 +21,11 @@ def load_user(user_id):
     except User.DoesNotExist:
         return None
 
-#connect to database before each request
 @app.before_request
 def before_request():
+    """Connect to the database before each request."""
     initialize()
 
-#routes for each page
 @app.route("/")
 def home():
     return render_template('landing_login_page.html')
@@ -51,75 +49,63 @@ def inbox():
 def notifications():
     return render_template('notifications.html')
 
-@app.route('/submit_message', methods=['POST'])
+# @app.route('/submit_message', methods=['POST'])
+# @login_required
+# def submit_message():
+#     message = request.form.get('send_message')
+#     messages.append(message)
+#     return redirect(url_for('feed'))
+
+@app.route('/submit_post', methods=['POST'])
 @login_required
-def submit_message():
-    message = request.form.get('send_message')
-    messages.append(message)
+def create_post():
+    user = current_user
+    content = request.form.get('send_post')
+
+    post = Post.create(user=user, content=content)
     return redirect(url_for('feed'))
 
-#login form method
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        
-        try:
-            user = User.get(User.username == username)
-            if bcrypt.check_password_hash(user.password, password):
-                login_user(user)
-                return redirect(url_for('feed'))
-            else:
-                flash("Invalid password", "error")
-        except User.DoesNotExist:
-            flash("Invalid username", "error")
-    
-    return render_template('login.html')
 
-#account creation method
+        user = User.get_or_none(User.username == username)  # Use get_or_none to avoid exceptions
+
+        if user and user.password == password:  # Check hashed password
+            login_user(user)  # Log the user in
+            return redirect(url_for('feed'))  # Redirect to feed after successful login
+        else:
+            flash("Invalid username or password", "error")  # Flash error message
+
+    return render_template('login.html')  # Render login page for GET requests
+
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
-        
+
+        # Hash the password
+        #hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
         try:
-            user = username
-            if bcrypt.check_password_hash(user.password, password):
-                login_user(user)
-                return redirect(url_for('feed'))
-            else:
-                flash("Invalid password", "error")
-        except User.DoesNotExist:
-            flash("Invalid username", "error")
-    
-    return render_template('login.html')
+            models.User.create_user(username, email, password, admin=False)
+            flash("Account created successfully. Please log in.", "success")  # Flash success message
+            return redirect(url_for('login'))  # Redirect to login after successful account creation
+        except Exception as e:
+            flash("Account creation failed: " + str(e), "error")  # Flash error message
 
-from flask import request, redirect, url_for
-
-@app.route('/create_post', methods=['GET', 'POST'])
-@login_required
-def create_post():
-    if request.method == 'POST':
-        user = ""  #implement authentication to get current user
-        content = request.form['content']
-
-        post = Post.create(user=user, content=content)
-    return render_template('notifications.html')
-
-@app.route('/feed')
-@login_required
-def homepage():
-    posts = Post.select().order_by(Post.timestamp.desc())
-    return render_template('home.html', posts=posts)
+    return render_template('register.html')  # Render registration page for GET requests
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for('home'))  # Redirect to home after logout
 
 if __name__ == '__main__':
     initialize()  # Initialize the database

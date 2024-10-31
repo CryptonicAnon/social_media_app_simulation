@@ -5,6 +5,7 @@
 h1 {text-align: center;}
 p {text-align: center;}
 .messages {text-align: center;}
+.create_post {text-align: center;}
 div { margin-bottom: 10px; }
 </style>
 </head>
@@ -23,11 +24,22 @@ div { margin-bottom: 10px; }
         <button>Check your inbox</button>
     </a>
 </div>
-<div  class="messages">
+<div>
+    <a href="http://127.0.0.1:5000/logout">
+        <button>Logout</button>
+    </a>
+</div>
+<!-- <div  class="messages">
     <form action="http://127.0.0.1:5000/submit_message" method="post">
         <label for="send_message">Send Message:</label><br>
         <input type="text" id="send_message" name="send_message" required><br><br>
         <input type="submit" value="Send to Inbox">
+</div> -->
+<div  class="create_post">
+    <form action="http://127.0.0.1:5000/submit_post" method="post">
+        <label for="send_post">Create post:</label><br>
+        <input type="text" id="send_post" name="send_post" required><br><br>
+        <input type="submit" value="Post to feed">
 </div>
 </form> 
 </body>
