@@ -1,1 +1,12 @@
-__pycache__/
+__pycache__
+test.py
+test2.txt
+README.md
+to_do_list.txt
+remove_comments.txt
+remove_comments_done.txt
+gadsby.txt
+HANGMAN
+*.db
+*.sqlite
+*.sqlite3
