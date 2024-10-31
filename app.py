@@ -79,17 +79,13 @@ def login():
 def create_account():
     if request.method == 'POST':
         username = request.form.get('username')
+        email = request.form.get('email')
         password = request.form.get('password')
         
         try:
-            user = username
-            if bcrypt.check_password_hash(user.password, password):
-                login_user(user)
-                return redirect(url_for('feed'))
-            else:
-                flash("Invalid password", "error")
-        except User.DoesNotExist:
-            flash("Invalid username", "error")
+            models.User.create_user(username, email, password, admin=False)
+        except:
+            pass
     
     return render_template('login.html')
 
@@ -97,7 +93,7 @@ def create_account():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return render_template('landing_login_page.html')
 
 if __name__ == '__main__':
     initialize()  # Initialize the database
