@@ -65,7 +65,7 @@ def send_dm():
 @app.route('/submit_post', methods=['POST'])
 @login_required
 def create_post():
-    user = current_user
+    user = current_user.username
     content = request.form.get('send_post')
 
     post = Post.create(user=user, content=content)

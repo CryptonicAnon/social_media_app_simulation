@@ -11,7 +11,7 @@ div { margin-bottom: 10px; }
 </head>
 <body>
 
-<h1>Your News Feed.</h1>
+<h1>Welcome, {{ current_user.username }}!</h1>
 <p>View the dumb stuff your friends post.</p>
 
 <div>
@@ -37,7 +37,7 @@ div { margin-bottom: 10px; }
     {% for post in posts %}
         <div>
             <li>{{ post.content }} </li> <!-- Adjust according to your Post model attributes -->
-            <!-- <p><small>Posted by: {{ post.user_id}}</small></p> Assuming you have a relationship with User model -->
+            <p><small>Posted by: {{ post.user_id}}</small></p>
         </div>
     {% endfor %}
 </div>
