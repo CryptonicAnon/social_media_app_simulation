@@ -22,7 +22,7 @@ class User(UserMixin, Model):
             cls.create(
                 username=username,
                 email=email,
-                password=generate_password_hash(password).decode('utf8'),
+                password=password,
                 is_admin=admin
             )
         except IntegrityError:
