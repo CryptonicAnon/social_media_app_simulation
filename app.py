@@ -4,6 +4,8 @@ from flask_login import LoginManager, login_user, logout_user, login_required
 import models
 from models import User, initialize  # Import models and initialize function
 
+#from models import User, Post, Relationship, initialize  # Import models and initialize function
+
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 bcrypt = Bcrypt(app)
@@ -53,6 +55,16 @@ def submit_message():
     message = request.form.get('send_message')
     messages.append(message)
     return redirect(url_for('feed'))
+
+# @app.route('/create_post', methods=['POST'])
+# @login_required
+# def create_post():
+#     user = user  #implement authentication to get current user
+#     content = request.form['content']
+
+#     post = Post.create(user=user, content=content)
+#     return render_template('feed.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
