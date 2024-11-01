@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
+<body style="background-color:powderblue;">
 <head>
 <style>
 h1 {text-align: center;}
 p {text-align: center;}
+div {text-align: center;}
 /* Center-align form containers */
 .center-container {
     display: flex;
@@ -14,20 +16,19 @@ p {text-align: center;}
 }
 </style>
 </head>
-<body>
 
-<h1>FAKE SOCIAL MEDIA MAIN PAGE.</h1>
-<p>MAIN PAGE SHENANIGANS.</p>
+<h1 style=background-color:DodgerBlue>WELCOME TO AN UNNAMED NON-PROPRIETARY SOCIAL MEDIA SITE.</h1>
+<p style="background-color: darkslateblue; -webkit-text-fill-color: aliceblue;">PLEASE LOG IN WITH AN EXISTING ACCOUNT OR CREATE ONE.</p>
 <div class="center-container">
   <a href="http://127.0.0.1:5000/login">
     <button>Login</button>
   </a>
   <a href="http://127.0.0.1:5000/create_account">
-    <button>Create Account</button>
-  </a>
-  <a href="http://127.0.0.1:5000/inbox">
-    <button>Inbox (Shouldnt work if you're properly logged out)</button>
+    <button style="background-color: coral;">Create Account</button>
   </a>
 </div> 
+<div class = center-container>
+  <img src="{{ url_for('static', filename='images/fakebook.png') }} "alt="Totally not Facebook....." width="900" height="300">
+</div>
 </body>
 </html>

@@ -2,8 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import models
-from models import User, Post, initialize  # Import models and initialize function
-
+from models import User, Post, Like, Comment, Relationship, initialize  # Import models and initialize function
+import peewee
 #from models import User, Post, Relationship, initialize  # Import models and initialize function
 
 app = Flask(__name__)
@@ -11,7 +11,8 @@ app.secret_key = 'your_secret_key'
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-messages = []
+dms = []
+
 
 # User loader function for Flask-Login
 @login_manager.user_loader
@@ -37,12 +38,20 @@ def register():
 @app.route("/feed")
 @login_required
 def feed():
-    return render_template('feed.html')
+    posts = Post.select()  # Fetch all posts from the database
+    return render_template('feed.html', posts=posts)
+
+@app.route('/send_dm', methods=['POST'])
+@login_required
+def send_dm():
+    dm = request.form.get('send_dm')
+    dms.append(dm)
+    return redirect(url_for('send_dm'))
 
 @app.route("/inbox")
 @login_required
 def inbox():
-    return render_template('inbox.html', messages=messages)
+    return render_template('inbox.html', dms=dms)
 
 @app.route("/notifications")
 @login_required
@@ -59,16 +68,10 @@ def notifications():
 @app.route('/submit_post', methods=['POST'])
 @login_required
 def create_post():
-    user = current_user
+    user = current_user.username
     content = request.form.get('send_post')
-
-    post = Post.create(user=user, content=content)
+    Post.create(user=user, content=content)
     return redirect(url_for('feed'))
-
-@app.route('/feed')
-def index():
-    stream = models.Post.select().limit(100)
-    return render_template('stream.html', stream=stream)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -104,6 +107,27 @@ def create_account():
             flash("Account creation failed: " + str(e), "error")  # Flash error message
 
     return render_template('register.html')  # Render registration page for GET requests
+
+@app.route('/like')
+@login_required
+def like_post(id):
+    post = Post.get_or_none(Post.id == id)
+    if post:
+        try:
+            Like.create(user=current_user, post=post)
+        except peewee.IntegrityError as err:
+            # Like already exists, do nothing
+            pass
+    return redirect(url_for('feed'))
+
+@app.route('/comment/', methods=['POST'])
+@login_required
+def comment_post(id):
+    post = Post.get_or_none(Post.id == id)
+    content = request.form.get('content')
+    if post and content:
+        Comment.create(user=current_user, post=post, content=content)
+    return redirect(url_for('feed'))
 
 @app.route('/logout')
 @login_required
