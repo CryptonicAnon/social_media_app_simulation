@@ -9,28 +9,29 @@ p {text-align: center;}
 div { margin-bottom: 10px; }
 </style>
 </head>
-<body>
+<body style="background-color: aqua;">
 
 <h1>Welcome, {{ current_user.username }}!</h1>
 <p>View the dumb stuff your friends post.</p>
 
 <div>
     <a href="http://127.0.0.1:5000/notifications">
-        <button>Go to your Notifications</button>
+        <button style="background-color: rgb(185, 255, 127);">Go to your Notifications</button>
     </a>
 </div>  
 <div>
     <a href="http://127.0.0.1:5000/inbox">
-        <button>Check your Inbox</button>
+        <button style="background-color: chartreuse;">Go to your Inbox</button>
     </a>
 </div>
 <div class="buttons">
     <a href="http://127.0.0.1:5000/dms">
-        <button>Send Another DM</button>
+        <button style="background-color: crimson; color: white;">Send Another DM</button>
+    </a>
 </div>
 <div>
     <a href="http://127.0.0.1:5000/logout">
-        <button>Logout</button>
+        <button style="background-color: black;color: white;">Logout</button>
     </a>
 </div>
 <div class="messages">
