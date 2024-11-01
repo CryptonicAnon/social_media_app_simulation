@@ -2,9 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import models
-from models import User, initialize, Post, Like  # Import models and initialize function
+from models import User, initialize, Post, Like, Comment  # Import models and initialize function
 import peewee
-from peewee import fn, JOIN
+from peewee import fn, JOIN, IntegrityError
 
 #from models import User, Post, Relationship, initialize  # Import models and initialize function
 
@@ -44,7 +44,10 @@ def feed():
         .join(Like, JOIN.LEFT_OUTER)
         .group_by(Post)
     )
-    return render_template('feed.html', posts=posts)
+    
+    comments_by_post = {post.id: Comment.select().where(Comment.post == post) for post in posts}
+    
+    return render_template('feed.html', posts=posts, comments_by_post=comments_by_post)
 
 @app.route("/inbox")
 @login_required
@@ -116,18 +119,21 @@ def like_post(id):
     if post:
         try:
             Like.create(user=current_user, post=post)
-        except peewee.IntegrityError:
+        except IntegrityError:
             # Like already exists, do nothing
             pass
     return redirect(url_for('feed'))
 
-@app.route('/comment/', methods=['POST'])
+@app.route('/submit_comment/<int:post_id>', methods=['POST'])
 @login_required
-def comment_post():
-    post = Post.get_or_none(Post.id == id)
-    content = request.form.get('content')
-    if post and content:
-        Comment.create(user=current_user, post=post, content=content)
+def submit_comment(post_id):
+    comment_content = request.form['comment']
+    post = Post.get_or_none(Post.id == post_id)
+    if post:
+        if comment_content.strip():  # Ensure the comment is not empty
+            Comment.create(content=comment_content, post=post, user=current_user)
+        else:
+            flash("Comment cannot be empty.", "error")  # Flash error if the comment is empty
     return redirect(url_for('feed'))
 
 @app.route('/logout')

@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style>
-h1 {text-align: center;}
-p {text-align: center;}
-.messages {text-align: center;}
-.create_post {text-align: center;}
-div { margin-bottom: 10px; }
-</style>
+    <style>
+        h1 { text-align: center; }
+        p { text-align: center; }
+        .messages { text-align: center; }
+        .create_post { text-align: center; }
+        div { margin-bottom: 10px; }
+        .post_content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
 </head>
 <body style="background-color: aqua;">
 
-<h1>Welcome, {{ current_user.username }}!</h1>
-<p>View the dumb stuff your friends post.</p>
+    <h1>Welcome, {{ current_user.username }}!</h1>
+    <p>View the dumb stuff your friends post.</p>
+    
     <div>
         <a href="http://127.0.0.1:5000/notifications">
             <button style="background-color: rgb(185, 255, 127);">Go to your Notifications</button>
@@ -30,9 +36,10 @@ div { margin-bottom: 10px; }
     </div>
     <div>
         <a href="http://127.0.0.1:5000/logout">
-            <button style="background-color: black;color: white;">Logout</button>
+            <button style="background-color: black; color: white;">Logout</button>
         </a>
     </div>
+
     <div class="messages">
         {% for post in posts %}
             <div>
@@ -41,14 +48,29 @@ div { margin-bottom: 10px; }
             </div>
             <a href="{{ url_for('like_post', id=post.id) }}">
                 <button>Like</button>
-                </a>
-            <a href="http://127.0.0.1:5000/comment">
-                <button>Comment</button>
             </a>
             <p>Likes: {{ post.like_count }}</p>
+            <div class="comments">
+                <h4>Comments:</h4>
+                {% if comments_by_post[post.id] %}
+                    {% for comment in comments_by_post[post.id] %}
+                        <p><strong>{{ comment.user.username }}:</strong> {{ comment.content }}</p>
+                    {% endfor %}
+                {% else %}
+                    <p>No comments.</p>
+                {% endif %}
+                
+                <div class="comment_form">
+                    <form action="{{ url_for('submit_comment', post_id=post.id) }}" method="post">
+                        <input type="text" name="comment" placeholder="Write a comment..." required>
+                        <button type="submit">Comment</button>
+                    </form>
+                </div>
+            </div>
         {% endfor %}
     </div>
-    <div  class="create_post">
+
+    <div class="create_post">
         <form action="http://127.0.0.1:5000/submit_post" method="post">
             <label for="send_post">Create post:</label><br>
             <input type="text" id="send_post" name="send_post" required><br><br>
