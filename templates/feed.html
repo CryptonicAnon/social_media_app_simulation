@@ -13,41 +13,47 @@ div { margin-bottom: 10px; }
 
 <h1>Welcome, {{ current_user.username }}!</h1>
 <p>View the dumb stuff your friends post.</p>
-
-<div>
-    <a href="http://127.0.0.1:5000/notifications">
-        <button style="background-color: rgb(185, 255, 127);">Go to your Notifications</button>
-    </a>
-</div>  
-<div>
-    <a href="http://127.0.0.1:5000/inbox">
-        <button style="background-color: chartreuse;">Go to your Inbox</button>
-    </a>
-</div>
-<div class="buttons">
-    <a href="http://127.0.0.1:5000/dms">
-        <button style="background-color: crimson; color: white;">Send Another DM</button>
-    </a>
-</div>
-<div>
-    <a href="http://127.0.0.1:5000/logout">
-        <button style="background-color: black;color: white;">Logout</button>
-    </a>
-</div>
-<div class="messages">
-    {% for post in posts %}
-        <div>
-            <li>{{ post.content }} </li> <!-- Adjust according to your Post model attributes -->
-            <p><small>Posted by: {{ post.user_id }}</small></p>
-        </div>
-    {% endfor %}
-</div>
-<div  class="create_post">
-    <form action="http://127.0.0.1:5000/submit_post" method="post">
-        <label for="send_post">Create post:</label><br>
-        <input type="text" id="send_post" name="send_post" required><br><br>
-        <input type="submit" value="Post to feed">
-</div>
-</form> 
+    <div>
+        <a href="http://127.0.0.1:5000/notifications">
+            <button style="background-color: rgb(185, 255, 127);">Go to your Notifications</button>
+        </a>
+    </div>  
+    <div>
+        <a href="http://127.0.0.1:5000/inbox">
+            <button style="background-color: chartreuse;">Go to your Inbox</button>
+        </a>
+    </div>
+    <div class="buttons">
+        <a href="http://127.0.0.1:5000/dms">
+            <button style="background-color: crimson; color: white;">Send Another DM</button>
+        </a>
+    </div>
+    <div>
+        <a href="http://127.0.0.1:5000/logout">
+            <button style="background-color: black;color: white;">Logout</button>
+        </a>
+    </div>
+    <div class="messages">
+        {% for post in posts %}
+            <div>
+                <li>{{ post.content }} </li>
+                <p><small>Posted by: {{ post.user_id }}</small></p>
+            </div>
+            <a href="{{ url_for('like_post', id=post.id) }}">
+                <button>Like</button>
+                </a>
+            <a href="http://127.0.0.1:5000/comment">
+                <button>Comment</button>
+            </a>
+            <p>Likes: {{ post.like_count }}</p>
+        {% endfor %}
+    </div>
+    <div  class="create_post">
+        <form action="http://127.0.0.1:5000/submit_post" method="post">
+            <label for="send_post">Create post:</label><br>
+            <input type="text" id="send_post" name="send_post" required><br><br>
+            <input type="submit" value="Post to feed">
+        </form> 
+    </div>
 </body>
 </html>

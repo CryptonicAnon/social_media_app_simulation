@@ -2,7 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import models
-from models import User, initialize, Post  # Import models and initialize function
+from models import User, initialize, Post, Like  # Import models and initialize function
+import peewee
+from peewee import fn, JOIN
 
 #from models import User, Post, Relationship, initialize  # Import models and initialize function
 
@@ -37,7 +39,11 @@ def register():
 @app.route("/feed")
 @login_required
 def feed():
-    posts = Post.select()  # Fetch all posts from the database
+    posts = (
+        Post.select(Post, fn.COUNT(Like.id).alias('like_count'))
+        .join(Like, JOIN.LEFT_OUTER)
+        .group_by(Post)
+    )
     return render_template('feed.html', posts=posts)
 
 @app.route("/inbox")
@@ -102,6 +108,27 @@ def create_account():
             flash("Account creation failed: " + str(e), "error")  # Flash error message
 
     return render_template('register.html')  # Render registration page for GET requests
+
+@app.route('/like/<int:id>')
+@login_required
+def like_post(id):
+    post = Post.get_or_none(Post.id == id)
+    if post:
+        try:
+            Like.create(user=current_user, post=post)
+        except peewee.IntegrityError:
+            # Like already exists, do nothing
+            pass
+    return redirect(url_for('feed'))
+
+@app.route('/comment/', methods=['POST'])
+@login_required
+def comment_post():
+    post = Post.get_or_none(Post.id == id)
+    content = request.form.get('content')
+    if post and content:
+        Comment.create(user=current_user, post=post, content=content)
+    return redirect(url_for('feed'))
 
 @app.route('/logout')
 @login_required
