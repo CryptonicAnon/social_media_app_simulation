@@ -7,11 +7,7 @@
         .messages { text-align: center; }
         .create_post { text-align: center; }
         div { margin-bottom: 10px; }
-        .post_content {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .basic-box {border: 1px solid #000; width: 300px; height: auto;margin: 0 auto; }
     </style>
 </head>
 <body style="background-color: aqua;">
@@ -42,8 +38,8 @@
 
     <div class="messages">
         {% for post in posts %}
-            <div>
-                <li>{{ post.content }} </li>
+            <div class ="basic-box">
+                <div> {{ post.content }} </div>
                 <p><small>Posted by: {{ post.user_id }}</small></p>
             </div>
             <a href="{{ url_for('like_post', id=post.id) }}">
