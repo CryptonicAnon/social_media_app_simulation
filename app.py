@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import models
-from models import User, initialize, Post, Like, Comment  # Import models and initialize function
+from models import User, initialize, Post, Like, Comment
 import peewee
 from peewee import fn, JOIN, IntegrityError
 
