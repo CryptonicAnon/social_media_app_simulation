@@ -1,3 +1,4 @@
+#imports
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -6,9 +7,7 @@ from models import User, initialize, Post, Like, Comment  # Import models and in
 import peewee
 from peewee import fn, JOIN, IntegrityError
 
-#from models import User, Post, Relationship, initialize  # Import models and initialize function
-
-app = Flask(__name__)
+app = Flask(__name__) 
 app.secret_key = 'your_secret_key'
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
@@ -23,19 +22,23 @@ def load_user(user_id):
     except User.DoesNotExist:
         return None
 
+#connect to databases
 @app.before_request
 def before_request():
     """Connect to the database before each request."""
     initialize()
 
+#home route
 @app.route("/")
 def home():
     return render_template('landing_login_page.html')
 
+#create account
 @app.route("/create_account")
 def register():
     return render_template('register.html')
 
+#news feed
 @app.route("/feed")
 @login_required
 def feed():
@@ -49,21 +52,25 @@ def feed():
     
     return render_template('feed.html', posts=posts, comments_by_post=comments_by_post)
 
+#inbox route
 @app.route("/inbox")
 @login_required
 def inbox():
     return render_template('inbox.html', dms=dms)
 
+#notifications
 @app.route("/notifications")
 @login_required
 def notifications():
     return render_template('notifications.html')
 
+#inbox
 @app.route("/dms")
 @login_required
 def send_dms():
     return render_template('dm.html', dms=dms)
 
+#to send dms
 @app.route('/send_dm', methods=['POST'])
 @login_required
 def send_dm():
@@ -88,7 +95,7 @@ def login():
 
         user = User.get_or_none(User.username == username)  # Use get_or_none to avoid exceptions
 
-        if user and user.password == password:  # Check hashed password
+        if user and user.password == password: 
             login_user(user)  # Log the user in
             return redirect(url_for('feed'))  # Redirect to feed after successful login
         else:

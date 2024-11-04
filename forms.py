@@ -1,8 +1,11 @@
+#imports
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField
 from wtforms.validators import (DataRequired, Regexp, ValidationError, Email,
                                Length, EqualTo)
 from models import User
+
+#forms used throughout the program
 
 def used_email(form, field):
     if User.select().where(User.email == field.data).exists():
